@@ -1,107 +1,157 @@
 var inquirer = require("inquirer");
+const Manager = require("./lib/Manager");
+const Engineer = require("./lib/Engineer");
+const Intern = require("./lib/Intern");
 var fs = require("fs");
-const util = require("util");
 
-const writeFileAsync = util.promisify(fs.writeFile);
+const team = [];
 
 
-function promptUser() {
-return inquirer.prompt([
-    {
+
+function position(){
+
+  return inquirer.prompt([
+    { type: "list",
+    message: "Which of the following would you like to add to your team?",
+    choices: ["Engineer", "Intern", "Finish"],
+    name: "position" 
+    }
+
+  ]).then(function(answers){
+
+    if(answers.position === "Engineer"){
+      engineer();
+     
+    }else if(answers.position === "Intern"){
+      intern();
+     
+    }else{
+      console.log ("thanks! You have created a team! Check the output folder to view team.")
+  console.log(team);
+  var jsonTeam = JSON.stringify(team)
+  fs.writeFileSync("./output/test.html", jsonTeam);
+    }
+  })};
+
+  
+function manager() {
+  return inquirer.prompt([
+      {
+          type: "input",
+          message: "What is the name of your manager?",
+          name: "name"
+      },
+  
+  
+      {
+          type: "input",
+          message: "What is their ID?",
+          name: "id"
+      },
+  
+      
+      {
         type: "input",
-        message: "What is the name of your manager?",
-        name: "names"
+        message: "What is their email address?",
+        name: "email"
     },
+    {
+      type: "input",
+      message: "What is their office number?",
+      name: "officeNumber"
+  },
+     
+  ]).then(function(answers){
+  
+    const manager = new Manager(
+      answers.name,
+      answers.id,
+      answers.email,
+      answers.officeNumber
+    );
+    team.push(manager);
+    console.log(manager);
+    position();
+  })};
 
-    // {
-    //     type: "input",
-    //     message: "What is your ID?",
-    //     name: "id"
-    // },
+function engineer(){
+  return inquirer.prompt([
+          
+    {
+      type: "input",
+      message: "What is the Engineer's name",
+      name: "engineerName"
+    },
+   {
+      type: "input",
+      message: "What is the Engineer's ID",
+      name: "engineerID"
+    },
+    {
+      type: "input",
+      message: "What is the Engineer's Email Adress",
+      name: "engineerEmail"
+    },
+    {
+      type: "input",
+      message: "What is the Engineer's Github Username",
+      name: "githubUsername"
+    }
+
+]).then(function(answers){
+  
+const engineer = new Engineer(
+  answers.engineerName,
+  answers.engineerID,
+  answers.engineerEmail,
+  answers.githubUsername
+);
+
+team.push(engineer);
+console.log(engineer);
+finish();
+
+})};
+
+function intern(){
+  return inquirer.prompt([  
+    {
+      type: "input",
+      message: "What is the Intern's name",
+      name: "internName"
+    },
+   {
+      type: "input",
+      message: "What is the Intern's ID",
+      name: "internID"
+    },
+    {
+      type: "input",
+      message: "What is the Intern's Email Address",
+      name: "internEmail"
+    },
+    {
+      type: "input",
+      message: "What school does the intern attend?",
+      name: "internSchool"
+    }]).then(function(answers){
+
+      const intern = new Intern(
+        answers.internName,
+        answers.internID,
+        answers.internEmail,
+        answers.internSchool
+      );
+        console.log(intern);
+        team.push(intern);
+        finish();
+    })};
 
     
-
-
-    {   type: "list",
-        message: "Which of the following would you like to add to your team?",
-        choices: ["Engineer", "Intern"],
-        name: "position"
-        
-    }
-   
-]).then(function(response){
-
-    // if(response.position === "Manager"){
-
-    //     inquirer.prompt([{
-    //         type: "input",
-    //         message: "What is you office number?",
-    //         name: "officeNumber"
-    //     }])
-
-        
     
-    if(response.position === "Engineer"){
-        return inquirer.prompt([{
-            type: "input",
-            message: "What is your Github Username?",
-            name: "githubUsername"
-        }])
+ 
+    function finish(){
+      position();
+    };
 
-}else{
-    return inquirer.prompt([{
-        type: "input",
-        message: "What school do you go to?",
-        name: "schoolName"
-    }])
-}})};
-
-
-
-
-
-
-
-function generateHTML(answers) {
-    return `
-  <!DOCTYPE html>
-  <html lang="en">
-  <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
-    <title>Document</title>
-  </head>
-  <body>
-    <div class="jumbotron jumbotron-fluid">
-    <div class="container">
-      <h1 class="display-4">Hi! My name is ${answers.names}</h1>
-      <p class="lead">I am from ${answers.position}.</p>
-      <h3>Example heading <span class="badge badge-secondary">Contact Me</span></h3>
-      <ul class="list-group">
-        <li class="list-group-item">My GitHub username is ${answers.githubUsername}</li>
-        <li class="list-group-item">LinkedIn: ${answers.schoolName}</li>
-      </ul>
-    </div>
-  </div>
-  </body>
-  </html>`;
-  }
-  
-  async function init() {
-    console.log("hi")
-    try {
-      const answers = await promptUser();
-  
-      const html = generateHTML(answers);
-  
-      await writeFileAsync("index.html", html);
-  
-      console.log("Successfully wrote to index.html");
-    } catch(err) {
-      console.log(err);
-    }
-  }
-  
-  init();
-  
+    manager();
