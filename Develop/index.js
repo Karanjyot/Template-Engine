@@ -89,7 +89,7 @@ function engineer(){
     },
     {
       type: "input",
-      message: "What is the Engineer's Email Adress",
+      message: "What is the Engineer's Email address",
       name: "engineerEmail"
     },
     {
